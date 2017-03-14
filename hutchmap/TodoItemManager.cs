@@ -88,7 +88,7 @@ namespace hutchmap
                 IEnumerable<TodoItem> items = await todoTable
                     .Where(todoItem => !todoItem.Done)
                     .ToEnumerableAsync();
-
+               
                 return new ObservableCollection<TodoItem>(items);
             }
             catch (MobileServiceInvalidOperationException msioe)
@@ -101,6 +101,76 @@ namespace hutchmap
             }
             return null;
         }
+
+        public async Task<List<PinData>> GetPinDataAsync(bool syncItems = false)
+        {
+            try
+            {
+#if OFFLINE_SYNC_ENABLED
+                if (syncItems)
+                {
+                    await this.SyncAsync();
+                }
+#endif
+                var items = new List<PinData>();                
+              
+                string username;
+                string state;
+                string score;
+                string ChallengeTimer;
+
+                string temp;
+                char splitChar = ',';
+
+                string[] temp2 = new string[5];
+
+                try
+                {
+                    foreach (var opponent in await todoTable.Where(todoItem => !todoItem.Done).ToEnumerableAsync())
+                    {
+                        if ((opponent != null) && (opponent.Name != null))
+                        {
+                            temp = opponent.Name;
+                            if (temp.Contains(splitChar.ToString()))
+                            {
+                                temp2 = temp.Split(splitChar);
+
+                                state = temp2[0];
+                                username = temp2[1];
+                                score = temp2[2];
+                                ChallengeTimer = temp2[3];
+
+                                PinData opPin = new PinData();
+
+                                opPin.OpLat = Convert.ToDouble(temp2[4]);
+                                opPin.OpLong = Convert.ToDouble(temp2[5]);
+                                opPin.UserName = temp2[1];
+
+                                items.Add(opPin);
+                            }
+                        }
+                    }
+                }
+
+                catch( Exception ex)
+                {
+                    items = null;
+                }
+
+                return items;
+            }
+            catch (MobileServiceInvalidOperationException msioe)
+            {
+                Debug.WriteLine(@"Invalid sync operation: {0}", msioe.Message);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(@"Sync error: {0}", e.Message);
+            }
+            return null;
+        }
+
+
 
         public async Task SaveTaskAsync(TodoItem item)
         {

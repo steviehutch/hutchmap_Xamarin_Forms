@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+using Xamarin.Forms.Maps;
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace UWP
@@ -24,7 +26,10 @@ namespace UWP
     {
         public MainPage()
         {
+            var MY_MAP_KEY = "9diqx2Yylc2nGObz2vJe~72boTGI_Y95nNZXXwDeTfw~AgeKkBxU76GeWMtJT8L1T6pDZ48q_OmQj8jalKdp8GDIvs6oHnPWngqusYPsbTPV";
             this.InitializeComponent();
+
+            Xamarin.FormsMaps.Init(MY_MAP_KEY);
 
             LoadApplication(new hutchmap.App());
         }
